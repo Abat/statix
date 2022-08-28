@@ -9,10 +9,10 @@ on:
 jobs:
   test:
     name: Test suite
-
-    runs-on: ubuntu-18.04
+    runs-on: self-hosted
 
     env:
+      ImageOS: ubuntu18
       MIX_ENV: test
       DATABASE_URL: "ecto://postgres:postgres@localhost:5432/statix_test"
 
@@ -23,8 +23,8 @@ jobs:
             { otp: 18.3, elixir: 1.3 },
             { otp: 19.3, elixir: 1.4 },
             { otp: 20.3, elixir: 1.5 },
-            { otp: 20.3, elixir: 1.6, env: 'set' },
-            { otp: 20.3, elixir: 1.6, env: 'unset' },
+            { otp: 20.3, elixir: 1.6, runtime: 'yes' },
+            { otp: 20.3, elixir: 1.6, runtime: 'no' },
             { otp: 21.0, elixir: 1.7 },
           ]
 
@@ -37,14 +37,14 @@ jobs:
           elixir-version: ${{ matrix.versions.elixir }}
           otp-version: ${{ matrix.versions.otp }}
       
-      - name: Statix test with runtime config true
-        if: ${{ matrix.versions.env == 'set' }}
+      - name: Set Statix runtime config to true
+        if: ${{ matrix.versions.runtime == 'yes' }}
         run: echo "Statix runtime config value is $STATIX_TEST_RUNTIME_CONFIG"
         env:
           STATIX_TEST_RUNTIME_CONFIG: true
       
-      - name: Statix test with runtime config false
-        if: ${{ matrix.versions.env == 'unset' }}
+      - name: Set Statix runtime config to false
+        if: ${{ matrix.versions.runtime == 'no' }}
         run: echo "Statix runtime config value is $STATIX_TEST_RUNTIME_CONFIG"
         env:
           STATIX_TEST_RUNTIME_CONFIG: false
@@ -63,7 +63,10 @@ jobs:
 
   format:
     name: Code linting
-    runs-on: ubuntu-18.04
+    runs-on: self-hosted
+
+    env:
+      ImageOS: ubuntu18
 
     steps:
       - uses: actions/checkout@v2
